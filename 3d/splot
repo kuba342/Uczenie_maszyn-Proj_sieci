@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Assuming your input files are in the directory "input_data"
+input_directory="."
+
+# Iterate over each file in the directory
+for data_file in "$input_directory"/*; do
+    if [ -f "$data_file" ]; then
+        # Extracting the first line (header) of the data file
+        header=$(head -n 1 "$data_file")
+
+        # Extracting the labels for x, y, and z axes
+        x_label=$(echo "$header" | awk '{print $1}')
+        y_label=$(echo "$header" | awk '{print $2}')
+        z_label=$(echo "$header" | awk '{print $3}')
+
+        # Plotting the data using Gnuplot
+        gnuplot << EOF
+set xlabel "$x_label"
+set ylabel "$y_label"
+set zlabel "$z_label"
+set term png
+set output "graph3d/${data_file%.txt}.png"
+splot "$data_file" using 1:2:3 with points title "Data"
+EOF
+    fi
+done
